@@ -1,0 +1,5 @@
+<library path="drive_by_pickup_nav2_plugin">
+  <class name="drive_by_pickup_nav2_plugin/DriveBy" type="drive_by_pickup_nav2_plugin::DriveBy" base_class_type="nav2_core::GlobalPlanner">
+	  <description>This is a planner plugin for a MiR robot to do drive by pickups.</description>
+	</class>
+</library>
