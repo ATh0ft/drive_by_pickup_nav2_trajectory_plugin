@@ -46,9 +46,6 @@
 
 
 
-#include "drive_by_pickup_nav2_plugin/pickup_mir_planner.hpp"
-#include <cstdio>
-
 
 #include <cmath>
 #include <string>
@@ -79,11 +76,105 @@ void DriveBy::configure(
 
 
 }
+void DriveBy::cleanup()
+{
+  RCLCPP_INFO(
+    node_->get_logger(), "CleaningUp plugin %s of type NavfnPlanner",
+    name_.c_str());
+}
 
+void DriveBy::activate()
+{
+  RCLCPP_INFO(
+    node_->get_logger(), "Activating plugin %s of type NavfnPlanner",
+    name_.c_str());
+}
+
+void DriveBy::deactivate()
+{
+  RCLCPP_INFO(
+    node_->get_logger(), "Deactivating plugin %s of type NavfnPlanner",
+    name_.c_str());
+}
+
+//this is the actual planning method 
+nav_msgs::msg::Path DriveBy::createPlan(
+  const geometry_msgs::msg::PoseStamped & start,
+  const geometry_msgs::msg::PoseStamped & goal)
+{
+  //create the global path variable 
+  nav_msgs::msg::Path global_path;
+
+
+  // Checking if the goal and start state is in the global frame
+  if (start.header.frame_id != global_frame_) {
+    RCLCPP_ERROR(
+      node_->get_logger(), "Planner will only except start position from %s frame",
+      global_frame_.c_str());
+    return global_path;
+  }
+
+  if (goal.header.frame_id != global_frame_) {
+    RCLCPP_INFO(
+      node_->get_logger(), "Planner will only except goal position from %s frame",
+      global_frame_.c_str());
+    return global_path;
+  }
+  global_path.poses.clear();
+  global_path.header.stamp = node_->now();
+  global_path.header.frame_id = global_frame_;
   
+  //the next part is different from the tutorial
+  //as a first step we try to implemt a plynomic blend speed but still in a straight line 
+  //the first step is to find the distace between the start and the goal 
+  double distance = std::hypot(goal.pose.position.x - start.pose.position.x, goal.pose.position.y - start.pose.position.y);
 
+  RCLCPP_INFO(node_->get_logger(), "the distance is %f ", distance);
 
+  //to get the amount of points we need the interpolation_resolution
+  int number_of_points = distance/interpolation_resolution_;
+  RCLCPP_INFO(node_->get_logger(), "the numer of via points is %d", number_of_points);
+  
+  //now to get the increment in the x and y direction 
+  double x_increment = (goal.pose.position.x - start.pose.position.x) / number_of_points;
+  double y_increment = (goal.pose.position.y - start.pose.position.y) / number_of_points;
 
+  for(int i = 0; i < number_of_points; ++i){
+    //we create a varible of the pose type 
+    geometry_msgs::msg::PoseStamped pose;
 
+    //we define the value of what that pose should be 
+    pose.pose.position.x = start.pose.position.x + x_increment * i;
+    pose.pose.position.y = start.pose.position.y + y_increment * i;
+    //the rest are variables we will leave for now
+    pose.pose.position.z = 0.0;
+    pose.pose.orientation.x = 0.0;
+    pose.pose.orientation.y = 0.0;
+    pose.pose.orientation.z = 0.0;
+    pose.pose.orientation.w = 1.0;
+    //i think this timestamps the pose point 
+    pose.header.stamp = node_->now();
+
+    //name the pose ig 
+    pose.header.frame_id = global_frame_;
+
+    //send the pose ig 
+    global_path.poses.push_back(pose);
+  }
+  //send the final pose ig 
+  geometry_msgs::msg::PoseStamped goal_pose = goal;
+  goal_pose.header.stamp = node_->now();
+  goal_pose.header.frame_id = global_frame_;
+  global_path.poses.push_back(goal_pose);
+
+  return global_path;
 
 }
+
+
+} // end of the hpp namespace  
+  
+// this is probably a macro that makes it work as a plugin 
+//
+#include "pluginlib/class_list_macros.hpp"
+PLUGINLIB_EXPORT_CLASS(drive_by_pickup_nav2_plugin::DriveBy, nav2_core::GlobalPlanner)
