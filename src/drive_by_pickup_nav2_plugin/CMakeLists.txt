@@ -28,10 +28,24 @@ find_package(nav2_costmap_2d REQUIRED)
 find_package(nav2_core REQUIRED)
 find_package(pluginlib REQUIRED)
 
+# add_executable(pickup_mir_planner src/pickup_mir_planner.cpp)
+#  target_include_directories(pickup_mir_planner PUBLIC
+#    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+#    $<INSTALL_INTERFACE:include>)
+# # target_compile_features(pickup_mir_planner PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
+#
+# install(TARGETS pickup_mir_planner
+#   DESTINATION lib/${PROJECT_NAME})
+
+# target_include_directories(
+#
+# )
 include_directories(
-  include
+  #[[ include ]]
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 )
 
+#
 set(library_name ${PROJECT_NAME}_plugin)
 
 set(dependencies
@@ -64,6 +78,10 @@ ament_target_dependencies(${library_name}
 
 target_compile_definitions(${library_name} PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
 
+# add_executable(pickup_mir_planner src/pickup_mir_planner.cpp)
+#  target_include_directories(pickup_mir_planner PUBLIC
+#    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+#    $<INSTALL_INTERFACE:include>)
 
 
 pluginlib_export_plugin_description_file(nav2_core global_planner_plugin.xml)
@@ -103,9 +121,9 @@ ament_package()
 
 #
 # add_executable(pickup_mir_planner src/pickup_mir_planner.cpp)
-# target_include_directories(pickup_mir_planner PUBLIC
-#   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-#   $<INSTALL_INTERFACE:include>)
+#  target_include_directories(pickup_mir_planner PUBLIC
+#    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+#    $<INSTALL_INTERFACE:include>)
 # target_compile_features(pickup_mir_planner PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
 #
 # install(TARGETS pickup_mir_planner
