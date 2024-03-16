@@ -48,6 +48,7 @@
 
 
 #include <cmath>
+#include <geometry_msgs/msg/detail/pose_stamped__struct.hpp>
 #include <string>
 #include <memory>
 #include "nav2_util/node_utils.hpp"
@@ -130,7 +131,6 @@ nav_msgs::msg::Path DriveBy::createPlan(
   double distance = std::hypot(goal.pose.position.x - start.pose.position.x, goal.pose.position.y - start.pose.position.y);
 
   RCLCPP_INFO(node_->get_logger(), "the distance is %f ", distance);
-
   //to get the amount of points we need the interpolation_resolution
   int number_of_points = distance/interpolation_resolution_;
   RCLCPP_INFO(node_->get_logger(), "the numer of via points is %d", number_of_points);

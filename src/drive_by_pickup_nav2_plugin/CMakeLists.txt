@@ -31,7 +31,7 @@ find_package(pluginlib REQUIRED)
 
 include_directories(
   include
-#[[   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> ]]
+
 )
 
 #
@@ -41,6 +41,7 @@ set(dependencies
   rclcpp
   rclcpp_action
   rclcpp_lifecycle
+  rclcpp_components
   std_msgs
   visualization_msgs
   nav2_util
@@ -70,7 +71,7 @@ target_compile_definitions(${library_name} PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNC
 
 
 
-pluginlib_export_plugin_description_file(nav2_core global_planner_plugin.xml)
+pluginlib_export_plugin_description_file(custom_nav2_core global_planner_plugin.xml)
 
 install(TARGETS ${library_name}
   ARCHIVE DESTINATION lib
